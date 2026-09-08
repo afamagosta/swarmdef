@@ -63,6 +63,13 @@ button.early:disabled{display:none}
   font-size:10px;padding:3px 7px;cursor:pointer;letter-spacing:.08em}
 #mus.off,#mute.off{color:var(--faint);opacity:.5}
 .stage{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+#topBar{display:none;flex:none;height:28px;background:rgba(11,15,18,.9);border-bottom:1px solid rgba(46,57,65,.5);align-items:center;padding:0 6px;gap:6px;z-index:10;position:relative}
+#topBar.on{display:flex}
+#topWave{flex:1;font-size:10px;color:#9AA9B3;font-family:var(--mono);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#topSkip{flex:none;background:var(--gas);color:#0C1114;border:none;font-family:var(--display);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:2px;cursor:pointer}
+#topSkip:disabled{display:none}
+#bossBarWrap{position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,.06)}
+#bossBarFill{height:4px;background:var(--red);transition:width .2s}
 canvas{width:100%;display:block;background:#0E1216;border:1px solid rgba(46,57,65,.6);touch-action:none}
 #cv{flex:1;min-height:0;height:100%}
 #dmgflash{position:absolute;inset:0;pointer-events:none;opacity:0;
@@ -112,7 +119,7 @@ canvas{width:100%;display:block;background:#0E1216;border:1px solid rgba(46,57,6
   padding:3px 5px;cursor:pointer;border-radius:1px 4px 4px 1px}
 #stage #spd button.on{background:rgba(111,195,223,.15);color:var(--min);
   border-color:var(--min);border-left-color:var(--min);font-weight:700}
-#stage .early{position:absolute;top:5px;right:6px;z-index:5;margin:0;
+#stage .early{display:none!important;
   font-size:9px;padding:3px 6px;letter-spacing:.04em;max-width:64px;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
 #pauseM{display:none;position:fixed;inset:0;background:rgba(6,9,12,.88);z-index:50;
@@ -226,8 +233,8 @@ button.g:not(:disabled):active{background:var(--panel2)}
   color:var(--min);margin:8px 0 3px}
 #chlog ul{margin:0;padding-left:16px;font-size:11px;color:var(--dim);line-height:1.5}
 .bal{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;font-size:11px;
-  color:var(--dim);margin:0 0 10px;padding:6px 8px;background:var(--panel);
-  border:1px solid var(--rule);
+  color:var(--dim);margin:0 0 10px;padding:6px 8px;background:transparent;
+  border:none;
   /* fixe au défilement : #menu est le conteneur qui défile (overflow-y:auto),
      donc position:sticky s'ancre bien en haut de sa fenêtre visible plutôt
      que de disparaître avec le titre quand on descend vers les catégories
@@ -340,7 +347,7 @@ button.g:not(:disabled):active{background:var(--panel2)}
 /* NOTIF */
 .navb-notif{position:absolute;top:4px;right:4px;background:var(--red);color:#fff;font-size:8px;font-weight:700;min-width:14px;height:14px;border-radius:7px;padding:0 2px;display:none;align-items:center;justify-content:center;line-height:1;font-family:var(--display)}
 .navb-notif.on{display:flex}
-#missBtn{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:0;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;line-height:1;color:#fff}
+#missBtn{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:0;width:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;line-height:1;color:#fff}
 #missBtn:active{background:var(--panel2)}
 #missBadge{position:absolute;top:-5px;right:-5px;background:var(--but);color:#0C1114;font-family:var(--display);font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;line-height:1}
 #missBadge.on{display:flex}
@@ -356,12 +363,12 @@ button.g:not(:disabled):active{background:var(--panel2)}
 .miss-claim{width:100%;padding:12px;margin-top:8px;font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
 
 /* MAIL */
-#mailBtn{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:0;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;line-height:1;color:#fff}
+#mailBtn{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:0;width:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;font-size:18px;line-height:1;color:#fff}
 #mailBtn:active{background:var(--panel2)}
 #mailBadge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-family:var(--display);font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;line-height:1}
 #mailBadge.on{display:flex}
-.bal-wrap{display:flex;align-items:center;gap:6px;flex:none;z-index:5;padding:6px 14px 4px;background:rgba(8,4,16,.85)}
-.bal{margin:0;flex:1;position:static!important}
+.bal-wrap{display:flex;align-items:stretch;gap:6px;flex:none;z-index:5;padding:6px 14px 4px;background:rgba(8,4,16,.85)}
+.bal{margin:0;flex:1;position:static!important;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;background:transparent;border:none}
 .mail-item{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:12px;margin-bottom:6px;cursor:pointer}
 .mail-item.unread{border-left:3px solid var(--red)}
 .mail-item .mail-subj{font-family:var(--display);font-size:12px;letter-spacing:.06em;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;gap:6px}
@@ -496,7 +503,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
       <span id="mailBadge"></span>
     </button>
     <div class="bal" id="mBal"></div>
-    <button id="missBtn" onclick="goPage('pgMissions')" title="Missions">◎
+    <button id="missBtn" onclick="goPage('pgMissions')" title="Missions">🎯
       <span id="missBadge"></span>
     </button>
   </div>
@@ -519,7 +526,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
   <div class="mpage on" id="pgHome" style="overflow:hidden;padding:0 14px 8px;justify-content:space-between">
     <div style="flex:none;text-align:center">
       <div class="mtitle" id="mtitleEl">Swarm<span style="color:var(--gas)">DEF</span></div>
-      <div class="msub"><button id="verBtn">v-6.71.1</button></div>
+      <div class="msub"><button id="verBtn">v-6.71.3</button></div>
     </div>
     <!-- mResult conservé vide pour compatibilité (les ids sont dans l'overlay) -->
     <div id="mResult" style="display:none"></div>
@@ -686,7 +693,13 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
     <span id="tutoNum" style="float:right;opacity:.65;font-size:11px"></span>
     <button id="tutoSkip" style="display:block;margin-top:5px;font-size:11px">Passer</button>
   </div>
-  <div class="stage" id="stage"><canvas id="cv" height="430"></canvas><div id="dmgflash"></div>
+  <div class="stage" id="stage">
+  <div id="topBar">
+    <div id="topWave"></div>
+    <button id="topSkip" disabled onclick="document.getElementById('early').click()">Skip</button>
+    <div id="bossBarWrap"><div id="bossBarFill" style="width:0%"></div></div>
+  </div>
+  <canvas id="cv" height="430"></canvas><div id="dmgflash"></div>
   <div id="prestFlash"></div>
   <div id="prestPop"></div>
     <button class="early" id="early" disabled>Skip</button>
@@ -2430,6 +2443,7 @@ function claimMailGift(mailId){
   if(m.gift.dia)meta.dia+=m.gift.dia;
   if(m.gift.gas)meta.gas+=m.gift.gas;
   meta.mailsGifted[mailId]=1;
+  SFX.reward();
   saveMeta();renderMailPage();renderMenu();}
 function renderMailPage(){
   const host=document.getElementById('mailList');if(!host)return;
@@ -2630,6 +2644,7 @@ function claimMissions(type){
   const r=MISS_REWARDS[type];
   if(r.gas)meta.gas+=r.gas; if(r.dia)meta.dia+=r.dia; if(r.rp)meta.rp+=r.rp;
   meta.missions[type].claimed=true;
+  SFX.reward();
   saveMeta();renderMissions();renderMenu();
 }
 function renderMissions(){
@@ -3031,6 +3046,13 @@ const SFX={
     [523,659,784,1046,1318].forEach((f,i)=>tone(f*p,0,.07,'triangle',.5,i*.045));
     tone(1568*p,0,.30,'triangle',.55,.23); noise(.10,.30,6000*p,2.2,.22);
     tone(196*p,0,.35,'sine',.4,.02); },
+  reward(){  /* Cadeau mail, récompense mission, boost codex */
+    const p=jit(.02);
+    tone(523*p,0,.07,'triangle',.45);
+    tone(659*p,0,.07,'triangle',.45,.07);
+    tone(784*p,0,.07,'triangle',.45,.14);
+    tone(1047*p,0,.12,'triangle',.55,.21);
+    noise(.06,.15,3200,2.0,.20); },
   flee(){ tone(520,380,.09,'square',.30); tone(380,300,.09,'square',.30,.09); },
   pickup(m){ const p=Math.pow(2,((m||1)-1)*.7);
     tone(784*p,0,.06,'triangle',.55); tone(1046*p,0,.06,'triangle',.55,.055);
@@ -4534,7 +4556,7 @@ function goPage(id){
     const e=document.getElementById(x); if(e)e.classList.toggle('on',x===id);});
   document.getElementById('menu').scrollTop=0;
   if(id==='pgRank') rgridFitZoom();
-  if(id==='pgBeast'){if(!meta.notifSeen)meta.notifSeen={};_markBeastSeen();}
+  if(id==='pgBeast'){if(!meta.notifSeen)meta.notifSeen={};if(_beastHasNew())SFX.reward();_markBeastSeen();}
   if(id==='pgUpg'){if(!meta.notifSeen)meta.notifSeen={};meta.notifSeen.upg=_upgSeenKey();}
   if(id==='pgMissions'){missInit();renderMissions();}   /* recalcule le zoom "tout voir" à chaque ouverture */
   renderMenu();
@@ -5007,7 +5029,7 @@ function drawGrid(){
 })();
 /* ═══ JOURNAL DES VERSIONS ═══ consultable en touchant le numéro sous le titre */
 const CHANGELOG=[
-               {v:'v-6.71.1', fr:[
+               {v:'v-6.71.3', fr:[
    'Monde : planète animée procédurale (canvas), rotation continue, halos, anneaux',
    'Monde positionné au-dessus du nav Guide/Paramètres/Upgrade…',
    'Bandeau "Pendant votre absence" : visible uniquement à la connexion, bouton ×',
@@ -5831,8 +5853,7 @@ function renderMenu(){
    }}
   {const bal=S('mBal');
    if(bal)bal.innerHTML =
-      '<span>'+T('best')+' <b>'+meta.best+'</b></span>'
-     +'<span>'+GA()+'<b style="color:var(--gasCol)">'+meta.gas.toLocaleString()+'</b></span>'
+      '<span>'+GA()+'<b style="color:var(--gasCol)">'+meta.gas.toLocaleString()+'</b></span>'
      +'<span>\u2605 <b style="color:var(--but)">'+meta.rp+'</b></span>'
      +'<span>'+DI()+'<b style="color:#E85BA8">'+meta.dia.toLocaleString()+'</b></span>';}
   /* le tutoriel disparaît dès qu'une partie a été jouée ; il se rappelle depuis Paramètres */
@@ -6774,24 +6795,7 @@ function draw(){
 /* surcouches d'interface : jamais affectées par le zoom */
 function drawHUD(cxp,cyp){
   /* bandeau peint sur le champ de bataille : il ne consomme plus de hauteur d'écran */
-  if(G.hudWave){
-    /* bandeau centré, laissé libre sur 96 px à droite pour la vitesse et le skip */
-    cx.fillStyle='rgba(11,15,18,.58)';cx.fillRect(0,0,Wp,16);
-    cx.textAlign='center';
-    const cxTxt=Wp/2;
-    cx.fillStyle='#9AA9B3';cx.font='9px ui-monospace,monospace';
-    cx.fillText(G.hudWave,cxTxt,11);
-    if(G.hudComp){cx.fillStyle='#D9564F';cx.font='bold 9px ui-monospace,monospace';
-      cx.fillText(G.hudComp,cxTxt,25);}
-    /* jauge du délai avant la vague suivante */
-    if(G.hudLeft!==undefined){
-      const tot=G.hudBusy?WAVE_LIMIT:WAVE_EVERY;
-      const k=Math.max(0,Math.min(1,1-G.hudLeft/tot));
-      cx.fillStyle='rgba(255,255,255,.08)';cx.fillRect(0,16,Wp,2);
-      cx.fillStyle=G.hudBusy?(G.hudLeft<6?'#E8484F':'#E8A33D'):'#4E5C66';
-      cx.fillRect(0,16,Wp*k,2);
-    }
-  }
+  /* bandeau vague et barre boss maintenant en HTML (#topBar) */
   drawFog(cxp,cyp);
   drawWeather();   /* météo : par-dessus le brouillard, sous l'UI */
   /* chantiers ouvrier / dépôt */
@@ -6813,16 +6817,7 @@ function drawHUD(cxp,cyp){
     cx.textAlign='center';cx.fillText(T('fCad')+' \u00D7'+G.combo.toFixed(2),cxp,cyp+CC_R+32);
   }
   /* barre de vie du boss */
-  const bs=G.enemies.find(e=>EN[e.ty].boss);
-  if(bs){
-    const w=Wp-40, x=20, y=34, k=Math.max(0,bs.hp/bs.max);   /* sous le bandeau de vague */
-    cx.fillStyle='#161012';cx.fillRect(x,y,w,13);
-    cx.fillStyle=ECOL[bs.ty];cx.globalAlpha=.85;cx.fillRect(x,y,w*k,13);cx.globalAlpha=1;
-    cx.strokeStyle=ECOL[bs.ty];cx.lineWidth=1;cx.strokeRect(x+.5,y+.5,w-1,12);
-    cx.fillStyle='#F0E4E6';cx.font='bold 9px ui-monospace,monospace';cx.textAlign='left';
-    cx.fillText((bs.ty==='X'?T('nBoss'):T('nMini'))+(bs.elite?' \u2620 '+T('eliteTag'):'')+'  \u2014  '+T('weak')+' '+SNAME()[ctrOf(bs)].toUpperCase(),x+6,y+9.5);
-    cx.textAlign='right';cx.fillText(Math.ceil(bs.hp)+' / '+bs.max,x+w-6,y+9.5);
-  }
+  /* barre boss maintenant en HTML (#topBar) */
 }
 
 /* ═══ SPRITES ═══ */
@@ -7512,6 +7507,24 @@ document.querySelectorAll('#gtabs button').forEach(b=>b.onclick=()=>{
   ['pb','pu','pl'].forEach(id=>document.getElementById(id).classList.remove('on'));
   document.getElementById({b:'pb',u:'pu',l:'pl'}[b.dataset.t]).classList.add('on');});
 
+function _updateTopBar(){
+  const tb=document.getElementById("topBar");
+  const tw=document.getElementById("topWave");
+  const ts=document.getElementById("topSkip");
+  const bf=document.getElementById("bossBarFill");
+  if(!tb||!G)return;
+  const active=running&&!PAUSED;
+  tb.classList.toggle("on",active);
+  if(!active)return;
+  /* texte vague */
+  if(tw&&G.hudWave)tw.textContent=G.hudWave+(G.hudComp?" — "+G.hudComp:"");
+  /* skip */
+  if(ts)ts.disabled=!document.getElementById("early")||document.getElementById("early").disabled;
+  /* barre boss */
+  const bs=G.enemies&&G.enemies.find(e=>EN[e.ty]&&EN[e.ty].boss);
+  if(bf)bf.style.width=bs?Math.max(0,bs.hp/bs.max*100)+"%":"0%";
+  if(bf)bf.style.background=bs?(ECOL&&ECOL[bs.ty]||"#E8484F"):"transparent";
+}
 function syncUI(){
   if(!G)return;
   const v=[Math.round(G.ore),G.squads.length,G.pop+'/'+G.popCap,
@@ -8005,7 +8018,7 @@ let last=0;
 function loop(now){const dt=Math.min(.05,(now-last)/1000)*TIME_SCALE;last=now;
   if(running&&!G.dead){
     for(let i=0;i<spdReal()&&!G.dead;i++)update(dt);   /* sous-pas : la physique reste stable */
-    draw();syncUI();}
+    draw();syncUI();_updateTopBar();}
   requestAnimationFrame(loop);}
 initLG();resize();buildUI();newRun();buildTreeUI();openMenu();
 /* ─── Collapse des sections d'amélioration ─── */
