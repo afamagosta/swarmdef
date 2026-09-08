@@ -320,12 +320,12 @@ button.g:not(:disabled):active{background:var(--panel2)}
 #ovtitle2{font-family:var(--display);font-size:20px;letter-spacing:.12em;text-transform:uppercase;
   flex:1;margin:0}
 /* ── Countdown canvas plein écran (overlay kill/win) ── */
-#countdownRing{position:relative;width:46px;height:46px;flex:none;cursor:pointer}
+#countdownRing{position:relative;width:52px;height:52px;flex:none;cursor:pointer}
 #countdownRing svg{position:absolute;inset:0}
 #countdownNum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink)}
 /* canvas plein écran sous la carte résultat */
-#cdCanvas{position:fixed;inset:0;pointer-events:none;z-index:79;display:none}
+#cdCanvas{position:fixed;inset:0;pointer-events:none;z-index:85;display:none}
 /* ── Buff rarité ── */
 .buf-common{border-color:#4A9A4A!important;box-shadow:0 0 8px rgba(74,154,74,.25)}
 .buf-rare{border-color:#3A7ABF!important;box-shadow:0 0 8px rgba(58,122,191,.30)}
@@ -529,7 +529,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
   <div class="mpage on" id="pgHome" style="overflow:hidden;padding:0 14px 8px;justify-content:space-between">
     <div style="flex:none;text-align:center">
       <div class="mtitle" id="mtitleEl">Swarm<span style="color:var(--gas)">DEF</span></div>
-      <div class="msub"><button id="verBtn">v-6.71.6</button></div>
+      <div class="msub"><button id="verBtn">v-6.72.0</button></div>
     </div>
     <!-- mResult conservé vide pour compatibilité (les ids sont dans l'overlay) -->
     <div id="mResult" style="display:none"></div>
@@ -4989,11 +4989,43 @@ function drawGrid(){
     rgridZoomAt(factor,cx,cy);
   },{passive:false});
   /* Drag */
+  /* Multi-touch : stocke jusqu'à 2 pointeurs actifs */
+  const _rPtrs=new Map();
+  let _rPinchDist0=null, _rPinchZoom0=null, _rPinchPX0=null, _rPinchPY0=null;
   cv2.onpointerdown=e=>{
-    RDRAG={x0:e.clientX,y0:e.clientY,px0:TREE_PX,py0:TREE_PY,moved:0};
     try{cv2.setPointerCapture(e.pointerId);}catch(err){}
+    _rPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(_rPtrs.size===1){
+      RDRAG={x0:e.clientX,y0:e.clientY,px0:TREE_PX,py0:TREE_PY,moved:0};
+    } else if(_rPtrs.size===2){
+      /* début pinch */
+      RDRAG=null;
+      const pts=[..._rPtrs.values()];
+      _rPinchDist0=Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y);
+      _rPinchZoom0=TREE_ZOOM;
+      _rPinchPX0=TREE_PX; _rPinchPY0=TREE_PY;
+    }
   };
   cv2.onpointermove=e=>{
+    _rPtrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(_rPtrs.size===2){
+      /* pinch : zoom centré sur le milieu des deux doigts */
+      const pts=[..._rPtrs.values()];
+      const dist=Math.hypot(pts[1].x-pts[0].x,pts[1].y-pts[0].y);
+      if(_rPinchDist0>0){
+        const factor=dist/_rPinchDist0;
+        const newZoom=Math.max(TREE_ZOOM_MIN,Math.min(TREE_ZOOM_MAX,_rPinchZoom0*factor));
+        const r=cv2.getBoundingClientRect();
+        const mx=(pts[0].x+pts[1].x)/2-r.left;
+        const my=(pts[0].y+pts[1].y)/2-r.top;
+        const cw=r.width, ch=r.height;
+        TREE_PX=(_rPinchPX0+(mx-cw/2))*(newZoom/_rPinchZoom0)-(mx-cw/2);
+        TREE_PY=(_rPinchPY0+(my-ch/2))*(newZoom/_rPinchZoom0)-(my-ch/2);
+        TREE_ZOOM=newZoom;
+        drawGrid();
+      }
+      return;
+    }
     if(!RDRAG)return;
     const dx=e.clientX-RDRAG.x0, dy=e.clientY-RDRAG.y0;
     RDRAG.moved=Math.max(RDRAG.moved,Math.hypot(dx,dy));
@@ -5001,9 +5033,12 @@ function drawGrid(){
     drawGrid();
   };
   function rgridEndDrag(e){
-    if(!RDRAG)return;
-    const moved=RDRAG.moved;
+    const wasPinch=_rPtrs.size>=2;
+    _rPtrs.delete(e.pointerId);
     try{cv2.releasePointerCapture(e.pointerId);}catch(err){}
+    if(_rPtrs.size<2){_rPinchDist0=null;}
+    if(wasPinch||!RDRAG)return;
+    const moved=RDRAG.moved;
     if(moved>6){RDRAG=null;return;}
     /* clic : convertir en coordonnées monde */
     const r=cv2.getBoundingClientRect();
@@ -5020,7 +5055,7 @@ function drawGrid(){
     RSEL=best.k; renderMenu();
   }
   cv2.onpointerup=rgridEndDrag;
-  cv2.onpointercancel=e=>{RDRAG=null;};
+  cv2.onpointercancel=e=>{_rPtrs.delete(e.pointerId);RDRAG=null;};
   /* Boutons overlay */
   const wrap=document.getElementById('rgridWrap');
   document.getElementById('rzIn').onclick=e=>{e.stopPropagation();
@@ -5032,7 +5067,7 @@ function drawGrid(){
 })();
 /* ═══ JOURNAL DES VERSIONS ═══ consultable en touchant le numéro sous le titre */
 const CHANGELOG=[
-               {v:'v-6.71.6', fr:[
+               {v:'v-6.72.0', fr:[
    'Monde : planète animée procédurale (canvas), rotation continue, halos, anneaux',
    'Monde positionné au-dessus du nav Guide/Paramètres/Upgrade…',
    'Bandeau "Pendant votre absence" : visible uniquement à la connexion, bouton ×',
@@ -6249,7 +6284,7 @@ function _startResultCountdown(win){
   /* grand canvas plein écran */
   const cv=document.getElementById('cdCanvas');
   const col=win?'#8FBF3F':'#D9564F';  /* vert si win, rouge si défaite */
-  if(cv){cv.style.display='block';cv.width=window.innerWidth;cv.height=window.innerHeight;}
+  if(cv){cv.style.display='block';cv.style.pointerEvents='all';cv.width=window.innerWidth;cv.height=window.innerHeight;}
   /* particules orbitales */
   const NPART=win?12:8;
   const parts=Array.from({length:NPART},(_,i)=>({
@@ -6300,6 +6335,7 @@ function _startResultCountdown(win){
       /* texte "tap pour annuler" */
       g.font=`${Math.round(RBASE*.10)}px ui-monospace,monospace`;
       g.fillStyle='rgba(255,255,255,.25)';
+      g.fillStyle='rgba(255,255,255,.4)';
       g.fillText('TAP TO CANCEL',cx,cy+RBASE*.28);
       /* ── particules orbitales ── */
       parts.forEach((p,pi)=>{
@@ -6328,7 +6364,7 @@ function _startResultCountdown(win){
         phg.addColorStop(1,'rgba(0,0,0,0)');
         g.fillStyle=phg;g.beginPath();g.arc(px2,py2,p.r*3,0,7);g.fill();});}
     if(remain>0){_cdRaf=requestAnimationFrame(tick);}
-    else if(cv){cv.style.display='none';cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
+    else if(cv){cv.style.display='none';cv.style.pointerEvents='none';cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
   }
   _cdRaf=requestAnimationFrame(tick);
   _cdTimer=setTimeout(()=>{
