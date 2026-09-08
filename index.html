@@ -112,7 +112,7 @@ canvas{width:100%;display:block;background:#0E1216;border:1px solid rgba(46,57,6
   display:flex;align-items:center;justify-content:center;opacity:.92}
 #gear:active{opacity:.55}
 #hudGear{display:flex;align-items:center;justify-content:center;padding:0;background:var(--panel)}
-#stage #spd{position:absolute;top:5px;left:6px;z-index:5;display:inline-flex;gap:2px}
+#stage #spd{position:absolute;top:33px;left:6px;z-index:5;display:inline-flex;gap:2px}
 #stage #spd button{background:rgba(11,15,18,.82);border:1px solid rgba(46,57,65,.7);
   border-left:2px solid rgba(111,195,223,.25);
   color:var(--faint);font-family:var(--mono);font-size:8px;line-height:1;
@@ -367,8 +367,8 @@ button.g:not(:disabled):active{background:var(--panel2)}
 #mailBtn:active{background:var(--panel2)}
 #mailBadge{position:absolute;top:-5px;right:-5px;background:var(--red);color:#fff;font-family:var(--display);font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 3px;display:none;align-items:center;justify-content:center;line-height:1}
 #mailBadge.on{display:flex}
-.bal-wrap{display:flex;align-items:stretch;gap:6px;flex:none;z-index:5;padding:6px 14px 4px;background:rgba(8,4,16,.85)}
-.bal{margin:0;flex:1;position:static!important;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;background:transparent;border:none}
+.bal-wrap{display:flex;align-items:stretch;gap:6px;flex:none;z-index:5;padding:6px 14px 4px;background:transparent}
+.bal{margin:0;flex:1;position:static!important;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:0 10px}
 .mail-item{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:12px;margin-bottom:6px;cursor:pointer}
 .mail-item.unread{border-left:3px solid var(--red)}
 .mail-item .mail-subj{font-family:var(--display);font-size:12px;letter-spacing:.06em;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;gap:6px}
@@ -526,7 +526,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
   <div class="mpage on" id="pgHome" style="overflow:hidden;padding:0 14px 8px;justify-content:space-between">
     <div style="flex:none;text-align:center">
       <div class="mtitle" id="mtitleEl">Swarm<span style="color:var(--gas)">DEF</span></div>
-      <div class="msub"><button id="verBtn">v-6.71.3</button></div>
+      <div class="msub"><button id="verBtn">v-6.71.4</button></div>
     </div>
     <!-- mResult conservé vide pour compatibilité (les ids sont dans l'overlay) -->
     <div id="mResult" style="display:none"></div>
@@ -5029,7 +5029,7 @@ function drawGrid(){
 })();
 /* ═══ JOURNAL DES VERSIONS ═══ consultable en touchant le numéro sous le titre */
 const CHANGELOG=[
-               {v:'v-6.71.3', fr:[
+               {v:'v-6.71.4', fr:[
    'Monde : planète animée procédurale (canvas), rotation continue, halos, anneaux',
    'Monde positionné au-dessus du nav Guide/Paramètres/Upgrade…',
    'Bandeau "Pendant votre absence" : visible uniquement à la connexion, bouton ×',
