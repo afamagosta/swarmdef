@@ -207,21 +207,16 @@ button.g:not(:disabled):active{background:var(--panel2)}
 .sur .s{position:relative;z-index:2;padding:0 10px;font-size:9px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--faint)}
 .sur.rdy .t{color:var(--gas)}.sur.late .t{color:var(--but)}
-#menu{position:fixed;inset:0;background:#080410;
+#menu{position:fixed;inset:0;background:#06030F;
   display:none;z-index:60;overflow:hidden;padding:0}
-#menu.on{display:flex;flex-direction:column;
-  animation:menuBgShift 10s ease-in-out infinite alternate}
-@keyframes menuBgShift{
-  0%  {background:linear-gradient(150deg,#140828 0%,#08040E 40%,#1E0A38 70%,#0A0418 100%)}
-  35% {background:linear-gradient(150deg,#0C0420 0%,#180830 40%,#080410 70%,#1A0832 100%)}
-  70% {background:linear-gradient(150deg,#1A0830 0%,#060210 40%,#160626 70%,#08040E 100%)}
-  100%{background:linear-gradient(150deg,#0E0620 0%,#1C0A34 40%,#070310 70%,#180830 100%)}}
-#menu.on{display:block}
-.mwrap{max-width:480px;margin:0 auto;width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
+#menu.on{display:flex;flex-direction:column}
+#menuStarBg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.mwrap{position:relative;z-index:1}
+.mwrap{max-width:480px;margin:0 auto;width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1}
 
 /* ─── Titre shimmer Zerg ─── */
 .mtitle{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:.22em;
-  text-transform:uppercase;text-align:center;padding:8px 0 2px;margin:0;
+  text-transform:uppercase;text-align:center;padding:20px 0 4px;margin:0;
   background:linear-gradient(105deg,#C084FC 10%,var(--min) 40%,#9966CC 55%,#C084FC 82%);
   background-size:260% auto;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
@@ -244,7 +239,7 @@ button.g:not(:disabled):active{background:var(--panel2)}
      d'amélioration les plus basses. */
   position:sticky;top:0;z-index:5}
 .bal b{font-family:var(--display);font-size:13px;font-weight:700}
-#rgridWrap{width:100%;height:360px;overflow:hidden;border:1px solid var(--rule);position:relative}
+#rgridWrap{width:100%;height:min(480px,55vh);overflow:hidden;border:1px solid var(--rule);position:relative}
 /* Pan/zoom géré entièrement en JS via une matrice de transformation canvas —
    le wrapper ne défile jamais, pas de scrollbar native.
    touch-action:none empêche le défilement tactile natif de s'y superposer. */
@@ -497,7 +492,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
   </div>
 </div>
 
-<div id="menu"><div class="mwrap">
+<div id="menu"><canvas id="menuStarBg"></canvas><div class="mwrap">
   <div id="chlog" class="result" style="display:none;text-align:left;margin-bottom:12px"></div>
   <div id="offBox" class="result" style="display:none;text-align:left;margin-bottom:12px"></div>
 
@@ -529,7 +524,7 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
   <div class="mpage on" id="pgHome" style="overflow:hidden;padding:0 14px 8px;justify-content:space-between">
     <div style="flex:none;text-align:center">
       <div class="mtitle" id="mtitleEl">Swarm<span style="color:var(--gas)">DEF</span></div>
-      <div class="msub"><button id="verBtn">v-6.72.0</button></div>
+      <div class="msub"><button id="verBtn">v-6.72.4</button></div>
     </div>
     <!-- mResult conservé vide pour compatibilité (les ids sont dans l'overlay) -->
     <div id="mResult" style="display:none"></div>
@@ -600,23 +595,27 @@ button.play{width:100%;background:var(--min);color:#0C1114;border:none;font-fami
     <p class="note" id="noteShop"></p>
   </div>
 
-  <div class="mpage" id="pgRank">
+  <div class="mpage" id="pgRank" style="padding-bottom:0">
     <button class="back" data-go="pgHome">← <span id="bkRank">Talent</span></button>
-    <!-- Arbre de talent EN PREMIER -->
+    <!-- Arbre de talent -->
     <div class="sec" id="secGrid">Arbre de talent</div>
     <div id="rgridWrap"><canvas id="rgrid" width="880" height="880"></canvas><div id="rgridZoom"><button id="rzIn">+</button><button id="rzOut">−</button></div></div>
-    <div id="nodeInfo" class="result" style="margin-top:8px"></div>
-    <!-- Points de talent + bouton prestige -->
-    <div class="res" style="grid-template-columns:1fr;margin-top:12px">
-      <div><div class="v" id="rkPts" style="color:var(--but)">0</div>
-        <div class="k" id="rkPtsK">Talent</div></div>
+    <!-- Description du nœud sélectionné -->
+    <div id="nodeInfo" class="result" style="margin-top:8px;margin-bottom:8px;flex:none"></div>
+    <!-- Spacer pour pousser la barre en bas -->
+    <div style="flex:1"></div>
+    <!-- Barre fixe bas : pts rang + prestige -->
+    <div style="flex:none;padding:8px 0 14px;border-top:1px solid var(--rule);margin-top:4px">
+      <!-- rkPts fantôme pour compat JS -->
+      <div id="rkPts" style="display:none">0</div>
+      <div id="rkPtsK" style="display:none"></div>
+      <button id="respecBtn" class="g" style="display:none;width:100%;margin-bottom:6px"><b id="respecBtnK"></b></button>
+      <button class="play" id="doPrest" style="background:var(--but);width:100%;margin:0">Prestige</button>
     </div>
-    <button id="respecBtn" class="g" style="display:none;width:100%;margin-bottom:8px"><b id="respecBtnK"></b></button>
-    <button class="play" id="doPrest" style="background:var(--but)">Prestige</button>
-    <!-- Explication prestige en bas -->
-    <div class="sec" id="secPrest">Prestige</div>
-    <div id="prestSim" class="result" style="margin-bottom:6px"></div>
-    <p class="note" id="prestNote"></p>
+    <!-- IDs fantômes pour la compat JS (prestSim/prestNote) -->
+    <div id="secPrest" style="display:none"></div>
+    <div id="prestSim" style="display:none"></div>
+    <p id="prestNote" style="display:none"></p>
   </div>
   <div class="mpage" id="pgBeast">
     <button class="back" data-go="pgHome">← <span id="bkBeast">Codex</span></button>
@@ -5067,7 +5066,7 @@ function drawGrid(){
 })();
 /* ═══ JOURNAL DES VERSIONS ═══ consultable en touchant le numéro sous le titre */
 const CHANGELOG=[
-               {v:'v-6.72.0', fr:[
+               {v:'v-6.72.4', fr:[
    'Monde : planète animée procédurale (canvas), rotation continue, halos, anneaux',
    'Monde positionné au-dessus du nav Guide/Paramètres/Upgrade…',
    'Bandeau "Pendant votre absence" : visible uniquement à la connexion, bouton ×',
@@ -5833,6 +5832,32 @@ function renderMenu(){
     if(lbl){lbl.style.color=open?w.accent:'var(--faint)';lbl.innerHTML='<div style="font-size:14px;font-weight:700">'+nm+'</div><div style="color:var(--dim);font-size:9px;letter-spacing:.06em">'+st+'</div>'+(sel&&!(!tutoCleared())&&open?'<div style="color:var(--but);font-size:9px;margin-top:2px">'+T('goPlay')+'</div>':'');}
   }
 
+/* ─ Slide planète gauche/droite ─ */
+function _slideWorld(wi,dir){
+  const pc=document.getElementById('planetCanvas');
+  const lb=document.getElementById('wPlanetLabel');
+  if(!pc)return;
+  const out=dir==='right'?'-60%':'60%';
+  const inc=dir==='right'?'60%':'-60%';
+  /* sortie */
+  pc.style.transition='transform .18s ease-in,opacity .18s ease-in';
+  pc.style.transform='translateX('+out+')';
+  pc.style.opacity='0';
+  if(lb){lb.style.transition='opacity .18s ease-in';lb.style.opacity='0';}
+  setTimeout(()=>{
+    /* entrée depuis l'autre côté */
+    pc.style.transition='none';
+    pc.style.transform='translateX('+inc+')';
+    pc.style.opacity='0';
+    startPlanetAnim(wi);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      pc.style.transition='transform .22s ease-out,opacity .22s ease-out';
+      pc.style.transform='translateX(0)';
+      pc.style.opacity='1';
+      if(lb){lb.style.transition='opacity .22s ease-out';lb.style.opacity='1';}
+    }));
+  },200);
+}
   function startPlanetAnim(wi){
     if(_planetRaf)cancelAnimationFrame(_planetRaf);
     _planetWi=wi; _planetRot=0;
@@ -5860,11 +5885,13 @@ function renderMenu(){
           +';background:'+(j===wi?(w2.accent||'var(--gas)'):unl?'var(--dim)':'var(--rule)')
           +'" data-wi="'+j+'"></span>';}).join('');
       dots.querySelectorAll('[data-wi]').forEach(d=>d.onclick=()=>{
-        const ni=+d.dataset.wi; if(wUnlocked(ni)){meta._navW=ni;startPlanetAnim(ni);}});
+        const ni=+d.dataset.wi; if(wUnlocked(ni)){
+          const dir=ni>wi?'right':'left';
+          meta._navW=ni; _slideWorld(ni,dir);}});
     }
     const prev=S('wPrev'),nxt=S('wNext');
-    if(prev)prev.onclick=()=>{meta._navW=((wi-1)+WORLDS.length)%WORLDS.length;startPlanetAnim(meta._navW);};
-    if(nxt)nxt.onclick=()=>{meta._navW=(wi+1)%WORLDS.length;startPlanetAnim(meta._navW);};
+    if(prev)prev.onclick=()=>{const nw=((wi-1)+WORLDS.length)%WORLDS.length;meta._navW=nw;_slideWorld(nw,'left');};
+    if(nxt)nxt.onclick=()=>{const nw=(wi+1)%WORLDS.length;meta._navW=nw;_slideWorld(nw,'right');};
   }
 
   if(meta._navW===undefined)meta._navW=meta.world;
@@ -8074,6 +8101,148 @@ document.querySelectorAll('.collapsible-hdr').forEach(hdr=>{
 /* seul moment fiable sur mobile : beforeunload n'est pas déclenché à la fermeture */
 try{document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveMeta();});}catch(e){}
 requestAnimationFrame(t=>{last=t;loop(t);});
+
+/* ══════════════════════════════════════════════════════════════
+   FOND ÉTOILÉ MENU — ciel nocturne, étoiles filantes, galaxies
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  let _sBg=null; /* RAF handle */
+  const menu=document.getElementById('menu');
+  const cv=document.getElementById('menuStarBg');
+  if(!cv)return;
+
+  /* ── Initialisation des objets ── */
+  const RNG=()=>Math.random();
+  let W,H,stars,nebulae,shooting;
+
+  function initScene(){
+    W=cv.width=menu.clientWidth||window.innerWidth;
+    H=cv.height=menu.clientHeight||window.innerHeight;
+    /* Étoiles fixes (250) : position, taille, luminosité, vitesse de scintillement */
+    stars=Array.from({length:250},()=>({
+      x:RNG()*W, y:RNG()*H,
+      r:0.3+RNG()*1.4,
+      base:0.3+RNG()*0.7,
+      phase:RNG()*Math.PI*2,
+      spd:0.4+RNG()*1.2,
+      col:RNG()<0.15?'#C8B8FF':RNG()<0.08?'#B8D8FF':'#FFFFFF'
+    }));
+    /* Nébuleuses / galaxies lointaines (5–7) */
+    nebulae=Array.from({length:5+Math.floor(RNG()*3)},()=>({
+      x:0.1+RNG()*0.8, y:0.05+RNG()*0.85,
+      rx:40+RNG()*80, ry:25+RNG()*50,
+      ang:RNG()*Math.PI,
+      col:RNG()<0.5?'rgba(120,60,200,':'rgba(60,40,160,',
+      op:0.03+RNG()*0.07
+    }));
+    /* Étoiles filantes : pool vide au départ */
+    shooting=[];
+  }
+
+  function spawnShoot(){
+    if(shooting.length>=2)return;
+    const side=RNG()<0.5;
+    const x=side?-20:W+20;
+    const ang=(RNG()*0.3+0.1)*(side?1:-1)+Math.PI*(side?0:1);
+    const spd=180+RNG()*120;
+    shooting.push({
+      x,y:RNG()*H*0.6,
+      vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd+(0.2+RNG()*0.6)*spd*0.4,
+      len:80+RNG()*80,
+      op:0, phase:'in', life:0,
+      col:RNG()<0.3?'#D0BFFF':'#FFFFFF'
+    });
+  }
+
+  function draw(t){
+    const g=cv.getContext('2d');
+    g.clearRect(0,0,W,H);
+
+    /* ── Fond dégradé nocturne ── */
+    const bg=g.createLinearGradient(0,0,W*0.4,H);
+    bg.addColorStop(0,'#08031A');
+    bg.addColorStop(0.4,'#06030F');
+    bg.addColorStop(0.7,'#0A0520');
+    bg.addColorStop(1,'#050210');
+    g.fillStyle=bg; g.fillRect(0,0,W,H);
+
+    /* ── Nébuleuses ── */
+    nebulae.forEach(n=>{
+      g.save();
+      g.translate(n.x*W,n.y*H);
+      g.rotate(n.ang);
+      const grd=g.createRadialGradient(0,0,0,0,0,n.rx);
+      grd.addColorStop(0,n.col+n.op+')');
+      grd.addColorStop(1,n.col+'0)');
+      g.scale(1,n.ry/n.rx);
+      g.fillStyle=grd;
+      g.beginPath(); g.arc(0,0,n.rx,0,Math.PI*2); g.fill();
+      g.restore();
+    });
+
+    /* ── Étoiles fixes ── */
+    stars.forEach(s=>{
+      const alpha=s.base+Math.sin(t*s.spd+s.phase)*(1-s.base)*0.5;
+      g.globalAlpha=Math.max(0.05,alpha);
+      g.fillStyle=s.col;
+      g.beginPath(); g.arc(s.x,s.y,s.r,0,Math.PI*2); g.fill();
+    });
+    g.globalAlpha=1;
+
+    /* ── Étoiles filantes ── */
+    shooting.forEach((s,i)=>{
+      s.life+=1/60;
+      const dur=s.len/200;
+      if(s.phase==='in'){s.op=Math.min(1,s.life/0.15);}
+      else{s.op=Math.max(0,1-(s.life-dur)/0.2);}
+      if(s.life>=dur&&s.phase==='in')s.phase='out';
+      if(s.phase==='out'&&s.op<=0){shooting.splice(i,1);return;}
+      s.x+=s.vx/60; s.y+=s.vy/60;
+      g.save();
+      g.globalAlpha=s.op*0.9;
+      g.strokeStyle=s.col;
+      g.lineWidth=1.5;
+      g.lineCap='round';
+      const grd2=g.createLinearGradient(s.x,s.y,s.x-s.vx/60*s.len/Math.hypot(s.vx,s.vy),s.y-s.vy/60*s.len/Math.hypot(s.vx,s.vy));
+      grd2.addColorStop(0,s.col);
+      grd2.addColorStop(1,'rgba(255,255,255,0)');
+      g.strokeStyle=grd2;
+      g.beginPath();
+      g.moveTo(s.x,s.y);
+      const dl=s.len/Math.hypot(s.vx,s.vy);
+      g.lineTo(s.x-s.vx*dl,s.y-s.vy*dl);
+      g.stroke();
+      g.restore();
+    });
+
+    /* Spawn aléatoire étoile filante */
+    if(RNG()<0.004)spawnShoot();
+  }
+
+  let _t=0;
+  function loop(ts){
+    if(!menu.classList.contains('on')){_sBg=null;return;}
+    _t=ts*0.001;
+    draw(_t);
+    _sBg=requestAnimationFrame(loop);
+  }
+
+  /* Démarrer quand le menu s'ouvre */
+  const _origOpen=window.openMenu;
+  function startStarBg(){
+    if(_sBg)return;
+    if(cv.width!==menu.clientWidth||cv.height!==menu.clientHeight)initScene();
+    _sBg=requestAnimationFrame(loop);
+  }
+  window.openMenu=function(){
+    if(_origOpen)_origOpen.apply(this,arguments);
+    setTimeout(startStarBg,50);
+  };
+  /* Aussi au load si le menu est déjà affiché */
+  if(menu.classList.contains('on')){initScene();startStarBg();}
+  /* Réinit si redimensionnement */
+  window.addEventListener('resize',()=>{if(menu.classList.contains('on'))initScene();});
+})();
 </script>
 </body>
 </html>
